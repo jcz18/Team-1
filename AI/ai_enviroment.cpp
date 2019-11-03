@@ -11,6 +11,8 @@
 #include "../General/Ship.h"
 #include "../General/Sector.h"
 #include "theta.h"
+#include "../Physics/phy_enviroment.h"
+#include "../Physics/TimeData.h"
 using namespace std;
 
 constexpr int PLAYER_WIDTH = 50;
@@ -40,43 +42,36 @@ void run_ai_enviro(gpRender gr){
 
 
 	//----------------------Player Ship initilization--------------------//
-	Ship playerShip;
-
-	playerShip.setSprite("Assets/Objects/ship_capital_ally.png");
-	playerShip.setPosition(pair<int,int>(50,50));
-	
-
-	SDL_Texture* ptex = gr.loadImage(playerShip.getSprite());
-	
+	SDL_Texture* ptex = gr.loadImage("Assets/Objects/ship_capital_ally");
 	SDL_Rect pdb = {50,50,PLAYER_WIDTH,PLAYER_HEIGHT};
-
-	
-	Sprite playerent(pdb, ptex);
-	osSprite.push_back(&playerent);
+	Ship playerShip(pdb,ptex,0);
+	//playerShip.setPosition(pair<int,int>(50,50));
+	playerShip.setRenderOrder(0);
+	osSprite.push_back(&playerShip);
 	
 	//--------------------------End-----------------------------------//
 
 	//----------------------AI Ship initilization--------------------//
-	Ship aiShip;
-	Ship aiShip2;
 	//AI init
 
 	AI ai;
 
-	aiShip.setSprite("Assets/Objects/ship_capital_enemy.png");
-	aiShip.setPosition(pair<int,int>(100,200));
-	aiShip.setDestination(pair<int,int>(1010, 600));
-	aiShip2.setSprite("Assets/Objects/ship_capital_hero.png");
-	aiShip2.setPosition(pair<int,int>(1000,400)); //omega weird how some values will seg fault but not for others
-	aiShip2.setDestination(pair<int,int>(200,600));
-	SDL_Texture* tex1 = gr.loadImage(aiShip.getSprite());
-	SDL_Texture* tex3 = gr.loadImage(aiShip2.getSprite());
+	SDL_Texture* tex1 = gr.loadImage("Assets/Objects/ship_capital_enemy.png");
+	SDL_Texture* tex3 = gr.loadImage("Assets/Objects/ship_capital_hero.png");
 	SDL_Rect db1 = {100,200,PLAYER_WIDTH,PLAYER_HEIGHT};
 	SDL_Rect db3 = {1000, 400, PLAYER_WIDTH,PLAYER_HEIGHT};
-	Sprite aient(db1, tex1);
-	Sprite aient2(db3,tex3);
-	osSprite.push_back(&aient);
-	osSprite.push_back(&aient2);
+	//Sprite aient(db1, tex1);
+	//Sprite aient2(db3,tex3);
+	Ship aiShip(db1,tex1);
+	Ship aiShip2(db3,tex3);
+        aiShip.setPosition(pair<int,int>(100,200));
+        aiShip.setDestination(pair<int,int>(1010, 600));
+        aiShip2.setPosition(pair<int,int>(1000,400)); //omega weird how some $
+        aiShip2.setDestination(pair<int,int>(200,600));
+	aiShip.setRenderOrder(0);
+	aiShip2.setRenderOrder(0);
+	osSprite.push_back(&aiShip);
+	osSprite.push_back(&aiShip2);
 //	cout<<"push back ok"<<endl;
 
 	//--------------------------End-----------------------------------//
@@ -158,16 +153,19 @@ void run_ai_enviro(gpRender gr){
 	//Game Loop
 	while(gameon) {
 		gr.setFrameStart(SDL_GetTicks());
-		//position needs to be in booleans?
+		while(SDL_PollEvent(&e)) {
+                        //std::cout << "Key Event!!!" << std::endl;
+                        gameon = handleKeyEvents(e, playerShip);
+		}
+                updatePosition2(playerShip, osSprite, ZONE_WIDTH, ZONE_HEIGHT);
 		if(aiShip.getPosition()!=aiShip.getDestination())
 		{
-		    aiShip.followPath(aient);
+		    aiShip.followPath();
 		    if(aiShip.getPathComplete())
 		    {
 				pathq = ai.calculatePath(aiShip,path);
 				aiShip.setPath(pathq);
 		    }
-		//cout<<"???????"<<endl;
 		}
 		else{
 		    aiShip.setDestination(pair<int,int>(10, 60));
@@ -176,26 +174,16 @@ void run_ai_enviro(gpRender gr){
 		}
 		if(aiShip2.getPosition()!=aiShip2.getDestination())
 		{
-		    aiShip2.followPath(aient2);
+		    aiShip2.followPath();
                     if(aiShip2.getPathComplete())
                     {
                                 pathq2 = ai.calculatePath(aiShip2,path2);
                                 aiShip2.setPath(pathq2);
                     }
-		//cout<<"ok?"<<endl;
 		}
-
 		//DOESN"T WORK AT THIS TIME
 		//Handles all incoming Key events
-		while(SDL_PollEvent(&e)) {
-			//std::cout << "Key Event!!!" << std::endl;
-			gameon = handleKeyEvents(e, playerShip);	
-			
-		}
-		//updatePosition(aient, osSprite, ZONE_WIDTH, ZONE_HEIGHT);
-
 		gr.renderOnScreenEntity(osSprite, bggalaxies, bgzonelayer1, bgzonelayer2, camera, fixed);
 		}
-
 
 }

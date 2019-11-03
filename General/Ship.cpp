@@ -214,7 +214,7 @@ void Ship::setPath(queue<pair<int,int>>* thePath)
     }
 
     //ai follows path assigned to it by ai class
-    void Ship::followPath(Sprite& entity)
+    void Ship::followPath()
     {
 	    //note: change the path in Ship.h to whatever is returned.
 	    if(!path->empty())
@@ -273,7 +273,7 @@ void Ship::setPath(queue<pair<int,int>>* thePath)
 			//cin>>n;
 			rotationSet=true;
 		}
-		double angle=entity.getAngle();
+		double angle=this->getAngle();
 		//cout<<"currotation:"<<curRotation<<endl;
 		//cout<<"cur angle: "<<angle<<endl;
 		bool angleChanged=false;
@@ -283,12 +283,12 @@ void Ship::setPath(queue<pair<int,int>>* thePath)
 		    if(curRotation>angle+maxRotation)
 		    {
 			if(maxRotation>rotation)
-			    entity.setAngle(angle+rotation++);
+			    this->setAngle(angle+rotation++);
 			else
-			    entity.setAngle(angle+rotation);
+			    this->setAngle(angle+rotation);
 		    }
 		    else
-		        entity.setAngle(angle+1);
+		        this->setAngle(angle+1);
 		    angleChanged=true;
 		}
 		else if(angle>curRotation)
@@ -296,16 +296,16 @@ void Ship::setPath(queue<pair<int,int>>* thePath)
 		    if(angle-maxRotation>curRotation)
 		    {
 			if(maxRotation>rotation)
-			    entity.setAngle(angle-(rotation++));
+			    this->setAngle(angle-(rotation++));
 			else
-			    entity.setAngle(angle-rotation);
+			    this->setAngle(angle-rotation);
 		    }
 		    else
-			entity.setAngle(angle-1);
+			this->setAngle(angle-1);
 		    angleChanged=true;
 		}
-		if(abs(entity.getAngle()>360))
-		    entity.setAngle((int)entity.getAngle()%360);
+		if(abs(this->getAngle()>360))
+		    this->setAngle((int)this->getAngle()%360);
 		//entity.setAngle(122);
 	//cout<<"cur_x: "<<cur_x<<" cur_y : "<<cur_y<<endl;
         //std::cout << "x: " << x_coord << " y: " << y_coord << "points remaing: " << path->size() << endl;
@@ -362,8 +362,8 @@ void Ship::setPath(queue<pair<int,int>>* thePath)
 			cur_y=y_coord; //skipped
 			rotationSet=false;
 		    }
-		    entity.setX(cur_x);
-		    entity.setY(cur_y);
+		    this->setX(cur_x);
+		    this->setY(cur_y);
 		    position.first=cur_x;
 		    position.second=cur_y;
 		}

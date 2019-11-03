@@ -74,7 +74,7 @@ class Ship : public Sprite
 
         void setPath(queue<pair<int, int>>* thePath);
         //ai follows path assigned to it by ai class
-        void followPath(Sprite& entity);
+        void followPath();
         bool getPathComplete();
         pair<int,int> getDestination();
         int getMaxVelocity();
